@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase App</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #userList { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Список пользователей</h1>
+    <input type="text" id="name" placeholder="Имя">
+    <input type="email" id="email" placeholder="Email">
+    <button id="addUser Btn">Добавить пользователя</button>
+
+    <div id="userList"></div>
+
+    <script>
+        // Конфигурация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyArNj_uuZ2dotvrAhzCN27xiNInVB_9yjo",
+  authDomain: "hrcom-52dad.firebaseapp.com",
+  projectId: "hrcom-52dad",
+  storageBucket: "hrcom-52dad.firebasestorage.app",
+  messagingSenderId: "343436005539",
+  appId: "1:343436005539:web:f699c2eb9f4e71c2dbef16",
+        };
+
+        // Инициализация Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Функция для добавления пользователя
+        document.getElementById('addUser Btn').addEventListener('click', () => {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            db.collection("users").add({
+                name: name,
+                email: email
+            })
+            .then(() => {
+                console.log("Пользователь добавлен!");
+                document.getElementById('name').value = '';
+                document.getElementById('email').value = '';
+                loadUsers();
+            })
+            .catch((error) => {
+                console.error("Ошибка добавления пользователя: ", error);
+            });
+        });
+
+        // Функция для загрузки пользователей
+        function loadUsers() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+
+            db.collection("users").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    const div = document.createElement('div');
+                    div.textContent = `${user.name} - ${user.email}`;
+                    userList.appendChild(div);
+                });
+            });
+        }
+
+        // Загрузка пользователей при загрузке страницы
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>
